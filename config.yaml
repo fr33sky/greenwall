@@ -6,31 +6,47 @@ general:
 groups:
   - name: Frontend (us-east-1)
     nodes:
-      - name: front-1 master host
+      - name: front-1 (current)
+        endpoint: https://httpbin.org/basic-auth/username/password
+        type: http_check
+        parameters:
+          expectedPattern: "\"authenticated\": true"
+          basicAuthUsername: username
+          basicAuthPassword: password
+      - name: front-2a (deprecated)
         endpoint: https://www.example.com/
         expectedPattern: Example
-      - name: intranet
+      - name: front-2b (deprecated)
         endpoint: https://www.example.com/
         expectedPattern: WillNotFindThis
-      - name: front-3
+      - name: front-2c (current)
         endpoint: https://www.example.com/
-        expectedPattern: Example
+        parameters:
+          expectedPattern: WillNotFindThis
+      - name: front-3
+        type: sample_check
+        parameters:
+          greenDay: 21
   - name: Middleware (us-west-2)
     nodes:
       - name: middleware-1 master host
         endpoint: https://www.example.com/
-      - name: middleware-2
-        endpoint: https://www.example.com/
-      - name: middleware-3
-        endpoint: https://www.example.com/
+      - name: localhost
+        endpoint: 127.0.0.1
+        type: ping_check
+      - name: Wirtualna Polska
+        endpoint: wp.pl
+        type: ping_check
       - name: middleware-4
-        endpoint: https://1234567890.example.com/
+        endpoint: 874397492374qwerty.pl
+        type: ping_check
       - name: middleware-5
         endpoint: https://www.example.com/
   - name: Backend (us-west-2)
     nodes:
       - name: backend-1 master host
-        endpoint: https://www.example.com/
+        endpoint: google.com:443
+        type: tls_check
       - name: backend-2
         endpoint: https://1234567890.example.com/
       - name: backend-3

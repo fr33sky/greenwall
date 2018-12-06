@@ -1,7 +1,6 @@
 # GreenWall
 
-![Logo of GreenWall]
-(http://icons.iconarchive.com/icons/iconka/easter-egg-bunny/128/green-cute-icon.png)
+![Logo of GreenWall](https://icons.iconarchive.com/icons/iconka/easter-egg-bunny/128/green-cute-icon.png)
 
 Status: **Done** (waiting for feedback)
 
@@ -28,8 +27,12 @@ The app can be installed in a couple of seconds thus do not hesitate to run this
 * web live dashboard based on Bootstrap
 * easily resizeable dashboard (wall, desktop, mobile screens)
 * definition of monitored hosts in a YAML file
-* use HTTP endpoints as source of health information
+* HTTP endpoint can be used as source of health information
+* HTTP basic access authentication
 * search for "healthy" phrases in HTTP responses
+* ICMP ping
+* check expired SSL certificates with TLS health check
+* pluggable health checks (waiting for TCP, DNS, REST, SOAP and others!)
 * install and run in a few seconds!
 
 ## Quickstart
@@ -50,29 +53,42 @@ groups:
   - name: Frontend Nodes (us-east-1)
     nodes:
       - name: front-1
-        endpoint: https://www.example.com/
-        expectedPattern: Example
+        endpoint: https://httpbin.org/basic-auth/username/password
+        type: http_check
+        parameters:
+            expectedPattern: "\"authenticated\": true"
+            basicAuthUsername: username
+            basicAuthPassword: password
       - name: front-2
         endpoint: https://www.example.com/
-        expectedPattern: WillNotFindThis
+        type: http_check
+        parameters:
+            expectedPattern: WillNotFindThis
   - name: Middleware Nodes (us-west-2)
     nodes:
       - name: middleware-1 with a really long name
         endpoint: https://www.example.com/
+        type: http_check
       - name: middleware-2
         endpoint: https://www.example.com/
+        type: http_check
   - name: Backend Nodes (us-west-2)
     nodes:
       - name: backend-1
         endpoint: https://www.example.com/
+        type: http_check
       - name: backend-2
         endpoint: https://www.example.com/
+        type: http_check
       - name: backend-3
         endpoint: https://www.example.com/
+        type: http_check
       - name: backend-4
         endpoint: https://1234567890.example.com/
+        type: http_check
       - name: backend-5
         endpoint: https://www.example.com/
+        type: http_check
 ```
 
 Run the application:
@@ -113,6 +129,20 @@ make: *** [test] Error 1
 [me@centos7t01 greenwall]$
 ```
 To resolve this issue, please elevate user permissions with ```sudo``` or use local Go installation.
+
+## Creating own, pluggable health check
+
+The author is welcome to any contributions to this project, especially new health check types. To create a new plugin, please look at first into sample implementation of ```SampleCheck```. This check is responsible for comparing the current day with a "green day" provided in configuration.
+
+See: [sample_check.go](https://github.com/mtojek/greenwall/blob/master/middleware/healthcheck/checks/sample_check.go)
+
+High priority health check plugins:
+* TCP
+* DNS 
+* REST
+* SOAP
+
+Please open a PR once you finish the implementation. Don't worry - I'll help you in pushing your change to the repository!
 
 ## Dist
 
